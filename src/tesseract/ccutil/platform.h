@@ -30,7 +30,9 @@ typedef struct _BLOB {
 } BLOB, *LPBLOB;
 #endif  /* __GNUC__ */
 #define SIGNED
+#if !defined(snprintf) && _MSC_VER < 1900
 #define snprintf _snprintf
+#endif
 #if (_MSC_VER <= 1400)
 #define vsnprintf _vsnprintf
 #endif /* _WIN32 */

@@ -1,5 +1,9 @@
 /*
- * Copyright (c) 2013 Sumit Ranjan
+ * \file    TesseractBinding.h
+ * \brief   Defines bindings for TessBaseAPI
+ * \author  Giancarlo Villanueva
+ *
+ * Copyright (c) 2016 Giancarlo Villanueva
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -8,8 +12,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,49 +24,62 @@
  * SOFTWARE.
  */
 
- #ifndef TESSERACTBINDING_H
- #define TESSERACTBINDING_H
+#ifndef TESSERACTBINDING_H
+#define TESSERACTBINDING_H
 
- #include <baseapi.h>
- #include <v8.h>
- #include <node.h>
- #include <allheaders.h>
+// Include node and v8 headers
+#include <v8.h>
+#include <node.h>
+#include <node_object_wrap.h>
 
-#define REQUIRE_ARG_NUM(num)                                          \
-  if (args.Length() < (num))                                          \
-    return ThrowException(Exception::Error(                           \
-    String::New("At least " #num " argument(s) should be defined.")))
+// Include tesseract base API and leptonica headers
+#include <baseapi.h>
+#include <allheaders.h>
 
-#define REQUIRE_STRING(VAR, pos)                          \
-  if (args.Length() <= (pos) || !args[pos]->IsString())   \
-    return ThrowException(Exception::TypeError(           \
-    String::New("Argument " #pos " must be a string")));  \
-  String::Utf8Value VAR(args[pos]->ToString());
+// Define macro to validate variable count
+#define REQUIRE_ARG_NUM(num) \
+if (args.Length() < (num)) { \
+isolate->ThrowException(Exception::TypeError( \
+String::NewFromUtf8(isolate, "At least " #num " argument(s) should be defined."))); \
+return; \
+}
 
- using namespace v8;
+// Define macro to validate variable at pos is string type
+#define REQUIRE_STRING(/*VAR, */pos) \
+if (!args[pos]->IsString()) { \
+isolate->ThrowException(Exception::TypeError( \
+String::NewFromUtf8(isolate, "Argument " #pos " must be a string"))); \
+//String::Utf8Value VAR(args[pos]->ToString()); \
+return; \
+}
 
- class TesseractBinding : public node::ObjectWrap {
-    
-    public:
-    static void Initialize(Handle<Object> target);
+using namespace v8;
 
-    private:
+class TesseractBinding : public node::ObjectWrap
+{
+public:
+    static void Initialize(Local<Object> exports);
+
+private:
     /* Constructor. */
     TesseractBinding();
-    
+
     /* Destructor. */
     ~TesseractBinding();
 
     /* Basic API's */
-    static Handle<Value> New(const Arguments& args);
-    static Handle<Value> Init(const Arguments& args);
-    static Handle<Value> SetImage(const Arguments& args);
-    static Handle<Value> ProcessImage(const Arguments& args);
-    static Handle<Value> GetText(const Arguments& args);
-    static Handle<Value> Close(const Arguments& args);
-    static Handle<Value> End(const Arguments& args);
+    static void New(const FunctionCallbackInfo<Value> args);
+    static void Init(const FunctionCallbackInfo<Value> args);
+    static void SetImage(const FunctionCallbackInfo<Value> args);
+    static void ProcessImage(const FunctionCallbackInfo<Value> args);
+    static void GetText(const FunctionCallbackInfo<Value> args);
+    static void Close(const FunctionCallbackInfo<Value> args);
+    static void End(const FunctionCallbackInfo<Value> args);
+
+    // JavaScript object constructor method
+    static Persistent<Function> constructor;
 
     tesseract::TessBaseAPI * t_api;
- };
+};
 
- #endif
+#endif

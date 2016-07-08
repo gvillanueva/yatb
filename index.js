@@ -1,7 +1,7 @@
-/*
- * \file    module.cc
- * \brief   Initializes bindings modules
- * \author  Giancarlo Villanueva
+/**
+ * @file        index.js
+ * @description Exports the JavaScript bindings to tesseract and leptonica
+ * @author      Giancarlo Villanueva
  *
  * Copyright (c) 2016 Giancarlo Villanueva
  *
@@ -24,16 +24,15 @@
  * SOFTWARE.
  */
 
-#include <node.h>
-#include <v8.h>
-#include "TesseractBinding.h"
-#include <allheaders.h>
+var path = require('path');
+var fs = require('fs');
 
-using namespace v8;
+var debugBinding = path.normalize(__dirname + '/build/Debug/yatb');
+var releaseBinding = path.normalize(__dirname + '/build/Release/yatb');
 
-void InitializeBindings(Local<Object> exports)
-{
-    TesseractBinding::Initialize(exports);
+// Test for debug binding and prefer it
+if (fs.existsSync(debugBinding)) {
+    module.exports = require(debugBinding);
+} else {
+    module.exports = require(releaseBinding);
 }
-
-NODE_MODULE(yatb, InitializeBindings)

@@ -299,6 +299,7 @@
               '__MSW32__',
               '_CRT_SECURE_NO_WARNINGS',
               'WINDLLNAME="libtesseract"',
+              'math.h=cmath',
             ],
             'include_dirs': [
               'port',
